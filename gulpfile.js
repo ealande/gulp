@@ -1,3 +1,5 @@
+const gulp = require('gulp')
+
 function standardFunction(callback){
     console.log ("Executing GULP");
 callback();}
@@ -12,5 +14,5 @@ function sayGoodbye(){
     console.log ("Goodbye,Gulp!")
 }
 
-exports.default = standardFunction;
+exports.default = gulp.series(standardFunction, sayHello);
 exports.sayHello = sayHello;
