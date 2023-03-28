@@ -1,18 +1,36 @@
-const gulp = require('gulp')
+const gulp = require('gulp');
+const sass = require('gulp-sass')(require('sass'));
+const sourcemaps = require('gulp-sourcemaps');
+const uglify = require('gulp-uglify');
+const obfuscate = require('gulp-obfuscate');
+const imagemin = require('gulp-imagemin');
 
-function standardFunction(callback){
-    console.log ("Executing GULP");
-callback();}
-
-function sayHello (callback) {
-    console.log ("Hello, Gulp!");
-    sayGoodbye();
-    callback();
+function compressImg(){
+    return gulp.src('./source/images/*')
+    .pipe(imagemin())
+    .pipe(gulp.dest('./build/images'))
 }
 
-function sayGoodbye(){
-    console.log ("Goodbye,Gulp!")
+function compressJs(){
+    return gulp.src('./source/scripts/*.js')
+    .pipe(uglify())
+    .pipe(obfuscate())
+    .pipe(gulp.dest('./build/scripts'))
+}
+function sassCompilation(){
+    return gulp.src('./source/styles/main.scss')
+    .pipe(sourcemaps.init())
+    .pipe(sass({
+        outputStyle: 'compressed'
+    }))
+    .pipe (sourcemaps.write('./maps'))
+    .pipe(gulp.dest('./build/styles'));
 }
 
-exports.default = gulp.series(standardFunction, sayHello);
-exports.sayHello = sayHello;
+
+
+exports.default = function(){
+    gulp.watch('./source/styles/*.scss',{ignoreInitial: false}, gulp.series(sassCompilation));
+    gulp.watch('./source/scripts/*.js',{ignoreInitial: false}, gulp.series(compressJs));
+    gulp.watch('./source/images/*',{ignoreInitial: false}, gulp.series(compressImg));
+}
